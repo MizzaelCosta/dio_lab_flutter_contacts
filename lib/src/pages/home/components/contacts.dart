@@ -16,6 +16,7 @@ class Contacts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final list = controller.contactsList;
+    const double width = 15.0;
 
     return ListView.builder(
       shrinkWrap: true,
@@ -53,30 +54,40 @@ class Contacts extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddContactPage(
-                                title: 'Editar Contato',
-                                contact: contact,
-                              ),
-                            ),
-                          ).then((_) => controller.getAllContacts());
-                        },
-                        icon: const Icon(Icons.edit)),
-                    IconButton(
-                        onPressed: () {
-                          controller.deleteContact(contact);
-                        },
-                        icon: const Icon(Icons.delete_outlined))
-                  ],
-                ),
+              PopupMenuButton(
+                elevation: 10.0,
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddContactPage(
+                            title: 'Editar Contato',
+                            contact: contact,
+                          ),
+                        ),
+                      ).then((_) => controller.getAllContacts());
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(Icons.edit),
+                        SizedBox(width: width),
+                        Text('Editar'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    onTap: () => controller.deleteContact(contact),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.delete_outlined),
+                        SizedBox(width: width),
+                        Text('Apagar'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
