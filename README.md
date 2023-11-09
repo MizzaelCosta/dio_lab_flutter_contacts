@@ -3,7 +3,7 @@
 Uma aplicação Flutter usando conceitos de Assincronismo, Armazenamento local.
 
 
-### Funções disponivéis
+### Funções disponíveis
 
 * Adicionar Contatos (foto, nome, telefone, e-mail).
 
