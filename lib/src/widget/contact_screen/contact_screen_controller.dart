@@ -5,8 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import '../../models/contact_model.dart';
 import '../../repositories/local_storage.dart';
 
-class AddContactController {
-  AddContactController(this._storage);
+class ContactScreenController {
+  ContactScreenController(this._storage);
 
   final LocalStorage _storage;
   XFile? _photo;

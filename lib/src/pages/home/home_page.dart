@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '/src/pages/home/components/contacts.dart';
 import '../../pages/home/home_controller.dart';
 import '../../widget/add_button.dart';
-import '../add/add_contact_page.dart';
+import '../../widget/contact_screen/contact_screen.dart';
 import 'components/search.dart';
 
 class HomePage extends StatefulWidget {
@@ -60,8 +60,10 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  const AddContactPage(title: 'Adicionar Contato'),
+              builder: (context) => const ContactScreen(
+                title: 'Adicionar Contato',
+                labelButton: 'Salvar',
+              ),
             ),
           ).then((_) => _homeController.getAllContacts());
         },

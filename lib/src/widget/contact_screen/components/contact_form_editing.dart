@@ -4,26 +4,30 @@ import 'package:provider/provider.dart';
 import 'package:validatorless/validatorless.dart';
 
 import '../../../models/contact_model.dart';
-import '../../../widget/add_button.dart';
-import '../../../widget/input_text.dart';
-import '../add_contact_controller.dart';
-import 'contact_image.dart';
+import '../../add_button.dart';
+import '../../input_text.dart';
+import '../contact_screen_controller.dart';
+import 'contact_image/contact_image.dart';
 
-class ContactsFormEditing extends StatefulWidget {
-  const ContactsFormEditing(
-    this.contact, {
+class ContactFormEditing extends StatefulWidget {
+  const ContactFormEditing({
     super.key,
+    this.contact,
+    this.readOnly = false,
+    this.labelButton,
   });
 
   final Contact? contact;
+  final bool readOnly;
+  final String? labelButton;
 
   @override
-  State<ContactsFormEditing> createState() => _ContactsFormEditingState();
+  State<ContactFormEditing> createState() => _ContactFormEditingState();
 }
 
-class _ContactsFormEditingState extends State<ContactsFormEditing> {
+class _ContactFormEditingState extends State<ContactFormEditing> {
   final formKey = GlobalKey<FormState>();
-  late AddContactController controller;
+  late ContactScreenController controller;
   late VoidCallback backToPreviousPage;
   late TextEditingController name;
   late TextEditingController phone;
@@ -31,13 +35,12 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
 
   @override
   void initState() {
-    controller = context.read<AddContactController>();
+    controller = context.read<ContactScreenController>();
     backToPreviousPage = controller.backToPreviousPage(context);
     name = TextEditingController(text: widget.contact?.name ?? '');
     phone = TextEditingController(
         text: controller.mask(widget.contact?.phone) ?? '');
     mail = TextEditingController(text: widget.contact?.mail);
-
     super.initState();
   }
 
@@ -47,7 +50,6 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
     name.dispose();
     phone.dispose();
     mail.dispose();
-
     super.dispose();
   }
 
@@ -69,6 +71,7 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
               children: [
                 ContactImage(
                   imagePath: widget.contact?.image,
+                  readOnly: widget.readOnly,
                 ),
                 SizedBox(
                   height: spaceBetween * 2,
@@ -78,6 +81,7 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
                   border: true,
                   controller: name,
                   textCapitalization: TextCapitalization.words,
+                  readOnly: widget.readOnly,
                   validator:
                       Validatorless.required('Nome deve ser preenchido.'),
                 ),
@@ -89,6 +93,7 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
                   border: true,
                   controller: phone,
                   keyBoardType: TextInputType.phone,
+                  readOnly: widget.readOnly,
                   validator: Validatorless.multiple([
                     Validatorless.required('Telefone deve ser preenchido.'),
                     Validatorless.min(16, 'O número deve ter 11 dígitos'),
@@ -109,41 +114,45 @@ class _ContactsFormEditingState extends State<ContactsFormEditing> {
                   border: true,
                   controller: mail,
                   keyBoardType: TextInputType.emailAddress,
+                  readOnly: widget.readOnly,
                   validator: Validatorless.email('E-mail inválido.'),
                 ),
                 SizedBox(
                   height: spaceBetween * 2,
                 ),
-                AddButton(
-                  label: 'Salvar',
-                  onPressed: () async {
-                    if (formKey.currentState!.validate()) {
-                      if (widget.contact != null) {
-                        final contact = widget.contact!.copyWith(
+                Visibility(
+                  visible: !widget.readOnly,
+                  child: AddButton(
+                    label: widget.labelButton ?? 'labelButton',
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        if (widget.contact != null) {
+                          final contact = widget.contact!.copyWith(
+                            name: name.text,
+                            phone: phone.text.replaceAll(RegExp(r'\D'), ''),
+                            mail: mail.text,
+                            image: await controller.returnImagePath(),
+                          );
+
+                          controller.updateContact(contact);
+                          backToPreviousPage();
+                          return;
+                        }
+
+                        final contact = Contact(
+                          //TODO implementar id único
+                          id: DateTime.now().toString(),
                           name: name.text,
                           phone: phone.text.replaceAll(RegExp(r'\D'), ''),
                           mail: mail.text,
                           image: await controller.returnImagePath(),
                         );
 
-                        controller.updateContact(contact);
+                        controller.insertContact(contact);
                         backToPreviousPage();
-                        return;
                       }
-
-                      final contact = Contact(
-                        //TODO implementar id único
-                        id: DateTime.now().toString(),
-                        name: name.text,
-                        phone: phone.text.replaceAll(RegExp(r'\D'), ''),
-                        mail: mail.text,
-                        image: await controller.returnImagePath(),
-                      );
-
-                      controller.insertContact(contact);
-                      backToPreviousPage();
-                    }
-                  },
+                    },
+                  ),
                 ),
               ],
             ),

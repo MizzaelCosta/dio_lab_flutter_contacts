@@ -10,6 +10,7 @@ class InputText extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.textInputAction = TextInputAction.next,
     this.keyBoardType = TextInputType.text,
+    this.readOnly = false,
     this.label,
     this.border = false,
     this.radius = 16.0,
@@ -21,6 +22,7 @@ class InputText extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final TextInputAction textInputAction;
   final TextInputType keyBoardType;
+  final bool readOnly;
   final String? label;
   final bool border;
   final double radius;
@@ -34,6 +36,7 @@ class InputText extends StatelessWidget {
       textCapitalization: textCapitalization,
       keyboardType: keyBoardType,
       textInputAction: TextInputAction.next,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: label,
         border: (border)
