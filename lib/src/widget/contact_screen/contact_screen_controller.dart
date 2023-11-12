@@ -70,4 +70,8 @@ class ContactScreenController {
   Future<void> updateContact(Contact contact) async {
     await _storage.update(contact);
   }
+
+  Future<void> deleteContact(Contact contact) async {
+    await _storage.delete(contact);
+  }
 }

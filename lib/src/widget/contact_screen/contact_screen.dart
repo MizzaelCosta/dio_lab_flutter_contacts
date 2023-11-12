@@ -5,7 +5,7 @@ import '/src/models/contact_model.dart';
 import 'components/contact_form_editing.dart';
 import 'contact_screen_controller.dart';
 
-class ContactScreen extends StatelessWidget {
+class ContactScreen extends StatefulWidget {
   const ContactScreen({
     super.key,
     required this.title,
@@ -20,20 +20,66 @@ class ContactScreen extends StatelessWidget {
   final String? labelButton;
 
   @override
-  Widget build(BuildContext context) {
-    final controller = context.read<ContactScreenController>();
+  State<ContactScreen> createState() => _ContactScreenState();
+}
 
+class _ContactScreenState extends State<ContactScreen> {
+  late ContactScreenController controller;
+  bool readOnly = false;
+  String? labelButton = '';
+
+  @override
+  void initState() {
+    super.initState();
+    readOnly = widget.readOnly;
+    labelButton = widget.labelButton;
+    controller = context.read<ContactScreenController>();
+  }
+
+  void needsRebuild() {
+    (context as Element).markNeedsBuild();
+  }
+
+  void _editingContact() {
+    readOnly = false;
+    labelButton = 'Atualizar';
+    needsRebuild();
+  }
+
+  List<Widget>? actions() {
+    return (readOnly)
+        ? [
+            IconButton(
+              onPressed: () {
+                _editingContact();
+              },
+              icon: const Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                controller.deleteContact(widget.contact!);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.delete_outlined),
+            )
+          ]
+        : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
+        title: Text(widget.title),
         leading: IconButton(
           onPressed: controller.backToPreviousPage(context),
           icon: const Icon(Icons.arrow_back_rounded),
         ),
+        actions: actions(),
       ),
       body: ContactFormEditing(
-        contact: contact,
+        contact: widget.contact,
         readOnly: readOnly,
         labelButton: labelButton,
       ),
