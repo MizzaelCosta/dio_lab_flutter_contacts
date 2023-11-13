@@ -92,7 +92,30 @@ class Contacts extends StatelessWidget {
                       ),
                     ),
                     PopupMenuItem(
-                      onTap: () => controller.deleteContact(contact),
+                      onTap: () {
+                        showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Apagar Contato'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  controller.deleteContact(contact);
+                                  Navigator.popUntil(
+                                      context, ((route) => route.isFirst));
+                                },
+                                child: const Text('Ok'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                       child: const Row(
                         children: [
                           Icon(Icons.delete_outlined),

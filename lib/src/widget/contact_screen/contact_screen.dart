@@ -46,7 +46,7 @@ class _ContactScreenState extends State<ContactScreen> {
     needsRebuild();
   }
 
-  List<Widget>? actions() {
+  List<Widget>? actions(BuildContext context) {
     return (readOnly)
         ? [
             IconButton(
@@ -57,8 +57,28 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             IconButton(
               onPressed: () {
-                controller.deleteContact(widget.contact!);
-                Navigator.pop(context);
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Apagar Contato'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          controller.deleteContact(widget.contact!);
+                          Navigator.popUntil(
+                              context, ((route) => route.isFirst));
+                        },
+                        child: const Text('Ok'),
+                      ),
+                    ],
+                  ),
+                );
               },
               icon: const Icon(Icons.delete_outlined),
             )
@@ -76,7 +96,7 @@ class _ContactScreenState extends State<ContactScreen> {
           onPressed: controller.backToPreviousPage(context),
           icon: const Icon(Icons.arrow_back_rounded),
         ),
-        actions: actions(),
+        actions: actions(context),
       ),
       body: ContactFormEditing(
         contact: widget.contact,
